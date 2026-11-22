@@ -12,14 +12,14 @@ import docx2txt
 from io import BytesIO
 import base64
 import matplotlib.pyplot as plt
-import google.generativeai as genai
+from google import genai
 import json
 from dotenv import load_dotenv
 
+
 load_dotenv()
-# Set up Gemini API key
-GEMINI_API_KEY =os.getenv("API_KEY")
-genai.configure(api_key=GEMINI_API_KEY)
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 
 # Set page configuration
@@ -449,13 +449,23 @@ def analyze_with_gemini(resume_data, job_description):
         **Output:** Provide a **well-structured text-based** summary, NOT in JSON format.
         """
 
+    
+    if not GEMINI_API_KEY:
+        return "AI analysis unavailable: Gemini API key is missing."
+
     try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content(prompt)
-        result = response.text  # Convert response to JSON
-        return result
+        client = genai.Client(api_key=GEMINI_API_KEY)
+
+        response = client.models.generate_content(
+            model="gemini-3.8-flash",
+            contents=prompt
+        )
+
+        return response.text or "No AI analysis returned."
+
     except Exception as e:
-        return {"error": str(e)}
+        return f"AI analysis unavailable: {type(e).__name__}: {e}"
+
 
 
 # Main app UI

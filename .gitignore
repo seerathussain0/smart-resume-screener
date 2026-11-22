@@ -1,0 +1,5 @@
+.env
+.venv/
+uploaded_resumes/
+.history/
+.ipynb_checkpoints/
